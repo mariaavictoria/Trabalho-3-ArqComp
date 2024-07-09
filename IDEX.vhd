@@ -21,6 +21,8 @@ ENTITY IDEX IS
     Rd_in           : IN std_logic_vector(4 DOWNTO 0);          -- Entrada da instrução atual buscada na memória de instruções
     Opcode_in		: IN std_logic_vector(6 DOWNTO 0);		    -- Entrada do Opcode
     JumpReg_in		: IN std_Logic;					    -- Entrada do JumpReg
+    Rs1_In		: IN std_logic_vector(4 downto 0);		    -- Entrada do Rs1	
+    Rs2_In		: IN std_logic_vector(4 downto 0);		    -- Entrada do Rs2
   
     ALUSrc_out      : out std_logic;                            -- Saídas do ALUSrc e ALUOp, que são sinais de controle para a ALU_Control
     ALUOp_out       : out std_logic_vector(1 downto 0);         -- ALUSrc e ALUOp são usados no estágio EX do pipeline, então não aparecem nos proximos regs do pipeline
@@ -38,14 +40,16 @@ ENTITY IDEX IS
     immediate_out   : out std_logic_vector(31 DOWNTO 0);        -- Saída do imediato gerado pelo ImmGen
     Rd_out          : out std_logic_vector(4 DOWNTO 0);         -- Saída da instrução atual buscada na memória de instruções
     Opcode_out		: out std_logic_vector(6 DOWNTO 0);	    -- Saída do Opcode
-    JumpReg_out	: out std_Logic					    -- Saída do JumpReg
+    JumpReg_out	: out std_Logic;					    -- Saída do JumpReg
+    Rs1_out		: out std_logic_vector(4 downto 0);	    -- Saída do Rs1	
+    Rs2_out		: out std_logic_vector(4 downto 0)		    -- Saída do Rs2
     );
 END IDEX;
 
 
 ARCHITECTURE TypeArchitecture OF IDEX IS
 
-SIGNAL idex_sig : std_logic_vector(160 DOWNTO 0);  -- Registrador de 151 bits para armazenar os valores do IDEX
+SIGNAL idex_sig : std_logic_vector(170 DOWNTO 0);  -- Registrador de 151 bits para armazenar os valores do IDEX
 
 BEGIN
 
@@ -68,7 +72,9 @@ BEGIN
             idex_sig(146 DOWNTO 115) <= immediate_in;   
             idex_sig(152 DOWNTO 147) <= Rd_in;
             idex_sig(159 downto 153) <= Opcode_in; 
-            idex_sig(160) <= JumpReg_in;        
+            idex_sig(160) <= JumpReg_in;  
+            idex_sig(165 downto 161) <= Rs1_In;
+            idex_sig(170 downto 166) <= Rs2_In;      
         END IF;
         IF (falling_edge(CLK)) THEN                 -- Detecção de descida de CLOCK
             ALUSrc_out <= idex_sig(0);       
@@ -88,6 +94,8 @@ BEGIN
             Rd_out <= idex_sig(152 DOWNTO 147);
             Opcode_out <= idex_sig(159 downto 153);
             JumpReg_out <= idex_sig(160);
+            Rs1_out <= idex_sig(165 downto 161);
+            Rs2_out <= idex_sig(170 downto 166);
         END IF;
     END PROCESS;
 
